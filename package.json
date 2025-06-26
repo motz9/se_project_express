@@ -1,0 +1,23 @@
+{
+  "name": "se_project_express",
+  "version": "0.1.0",
+  "description": "wtwr backend",
+  "homepage": "https://github.com/motz9/se_project_express#readme",
+  "bugs": {
+    "url": "https://github.com/motz9/se_project_express/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/motz9/se_project_express.git"
+  },
+  "license": "ISC",
+  "author": "Matthew Lane",
+  "type": "commonjs",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
