@@ -5,13 +5,14 @@ const {
   SERVER_ERROR_STATUS_CODE,
 } = require("../utils/errors");
 
-
 const getItems = (req, res) => {
   ClothingItem.find({})
     .then((items) => res.status(200).send(items))
     .catch((err) => {
       console.error(err);
-      return res.status(SERVER_ERROR_STATUS_CODE).send({ message: err.message });
+      return res
+        .status(SERVER_ERROR_STATUS_CODE)
+        .send({ message: err.message });
     });
 };
 
@@ -24,9 +25,13 @@ const createItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        return res.status(BAD_REQUEST_STATUS_CODE).send({ message: err.message });
+        return res
+          .status(BAD_REQUEST_STATUS_CODE)
+          .send({ message: err.message });
       }
-      return res.status(SERVER_ERROR_STATUS_CODE).send({ message: err.message });
+      return res
+        .status(SERVER_ERROR_STATUS_CODE)
+        .send({ message: err.message });
     });
 };
 
@@ -40,10 +45,15 @@ const updateItem = (req, res) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
         return res.status(NOT_FOUND_STATUS_CODE).send({ message: err.message });
-      } else if (err.name === "CastError") {
-        return res.status(BAD_REQUEST_STATUS_CODE).send({ message: err.message });
       }
-      return res.status(SERVER_ERROR_STATUS_CODE).send({ message: err.message });
+      if (err.name === "CastError") {
+        return res
+          .status(BAD_REQUEST_STATUS_CODE)
+          .send({ message: err.message });
+      }
+      return res
+        .status(SERVER_ERROR_STATUS_CODE)
+        .send({ message: err.message });
     });
 };
 
@@ -57,10 +67,15 @@ const deleteItem = (req, res) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
         return res.status(NOT_FOUND_STATUS_CODE).send({ message: err.message });
-      } else if (err.name === "CastError") {
-        return res.status(BAD_REQUEST_STATUS_CODE).send({ message: err.message });
       }
-      return res.status(SERVER_ERROR_STATUS_CODE).send({ message: err.message });
+      if (err.name === "CastError") {
+        return res
+          .status(BAD_REQUEST_STATUS_CODE)
+          .send({ message: err.message });
+      }
+      return res
+        .status(SERVER_ERROR_STATUS_CODE)
+        .send({ message: err.message });
     });
 };
 
@@ -76,10 +91,15 @@ const likeItem = (req, res) =>
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
         return res.status(NOT_FOUND_STATUS_CODE).send({ message: err.message });
-      } else if (err.name === "CastError") {
-        return res.status(BAD_REQUEST_STATUS_CODE).send({ message: err.message });
       }
-      return res.status(SERVER_ERROR_STATUS_CODE).send({ message: err.message });
+      if (err.name === "CastError") {
+        return res
+          .status(BAD_REQUEST_STATUS_CODE)
+          .send({ message: err.message });
+      }
+      return res
+        .status(SERVER_ERROR_STATUS_CODE)
+        .send({ message: err.message });
     });
 
 const dislikeItem = (req, res) =>
@@ -94,10 +114,22 @@ const dislikeItem = (req, res) =>
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
         return res.status(NOT_FOUND_STATUS_CODE).send({ message: err.message });
-      } else if (err.name === "CastError") {
-        return res.status(BAD_REQUEST_STATUS_CODE).send({ message: err.message });
       }
-      return res.status(SERVER_ERROR_STATUS_CODE).send({ message: err.message });
+      if (err.name === "CastError") {
+        return res
+          .status(BAD_REQUEST_STATUS_CODE)
+          .send({ message: err.message });
+      }
+      return res
+        .status(SERVER_ERROR_STATUS_CODE)
+        .send({ message: err.message });
     });
 
-module.exports = { getItems, createItem, updateItem, deleteItem, likeItem, dislikeItem };
+module.exports = {
+  getItems,
+  createItem,
+  updateItem,
+  deleteItem,
+  likeItem,
+  dislikeItem,
+};
