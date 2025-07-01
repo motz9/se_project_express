@@ -7,12 +7,12 @@ const {
 
 const getItems = (req, res) => {
   ClothingItem.find({})
-    .then((items) => res.status(200).send(items))
+    .then((items) => res.send(items))
     .catch((err) => {
       console.error(err);
       return res
         .status(SERVER_ERROR_STATUS_CODE)
-        .send({ message: err.message });
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
@@ -27,33 +27,11 @@ const createItem = (req, res) => {
       if (err.name === "ValidationError") {
         return res
           .status(BAD_REQUEST_STATUS_CODE)
-          .send({ message: err.message });
+          .send({ message: "Invalid data" });
       }
       return res
         .status(SERVER_ERROR_STATUS_CODE)
-        .send({ message: err.message });
-    });
-};
-
-const updateItem = (req, res) => {
-  const { itemId } = req.params;
-  const { imageUrl } = req.body;
-  ClothingItem.findByIdAndUpdate(itemId, { $set: { imageUrl } })
-    .orFail()
-    .then((item) => res.status(200).send({ data: item }))
-    .catch((err) => {
-      console.error(err);
-      if (err.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND_STATUS_CODE).send({ message: err.message });
-      }
-      if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST_STATUS_CODE)
-          .send({ message: err.message });
-      }
-      return res
-        .status(SERVER_ERROR_STATUS_CODE)
-        .send({ message: err.message });
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
@@ -62,7 +40,7 @@ const deleteItem = (req, res) => {
 
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
-    .then((item) => res.status(200).send({ data: item }))
+    .then((item) => res.send({ data: item }))
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
@@ -71,11 +49,11 @@ const deleteItem = (req, res) => {
       if (err.name === "CastError") {
         return res
           .status(BAD_REQUEST_STATUS_CODE)
-          .send({ message: err.message });
+          .send({ message: "Invalid data" });
       }
       return res
         .status(SERVER_ERROR_STATUS_CODE)
-        .send({ message: err.message });
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
@@ -86,7 +64,7 @@ const likeItem = (req, res) =>
     { new: true }
   )
     .orFail()
-    .then((item) => res.status(200).send({ data: item }))
+    .then((item) => res.send({ data: item }))
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
@@ -95,11 +73,11 @@ const likeItem = (req, res) =>
       if (err.name === "CastError") {
         return res
           .status(BAD_REQUEST_STATUS_CODE)
-          .send({ message: err.message });
+          .send({ message: "Invalid data" });
       }
       return res
         .status(SERVER_ERROR_STATUS_CODE)
-        .send({ message: err.message });
+        .send({ message: "An error has occurred on the server" });
     });
 
 const dislikeItem = (req, res) =>
@@ -109,7 +87,7 @@ const dislikeItem = (req, res) =>
     { new: true }
   )
     .orFail()
-    .then((item) => res.status(200).send({ data: item }))
+    .then((item) => res.send({ data: item }))
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
@@ -118,17 +96,16 @@ const dislikeItem = (req, res) =>
       if (err.name === "CastError") {
         return res
           .status(BAD_REQUEST_STATUS_CODE)
-          .send({ message: err.message });
+          .send({ message: "Invalid data" });
       }
       return res
         .status(SERVER_ERROR_STATUS_CODE)
-        .send({ message: err.message });
+        .send({ message: "An error has occurred on the server" });
     });
 
 module.exports = {
   getItems,
   createItem,
-  updateItem,
   deleteItem,
   likeItem,
   dislikeItem,
