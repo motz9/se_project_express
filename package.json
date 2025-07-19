@@ -21,7 +21,9 @@
     "dev": "nodemon app.js"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.2",
     "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.16.1",
     "validator": "^13.15.15"
   },
