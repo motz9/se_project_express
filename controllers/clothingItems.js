@@ -3,6 +3,7 @@ const {
   BAD_REQUEST_STATUS_CODE,
   NOT_FOUND_STATUS_CODE,
   SERVER_ERROR_STATUS_CODE,
+  FORBIDDEN_STATUS_CODE,
 } = require("../utils/errors");
 
 const getItems = (req, res) => {
@@ -37,10 +38,21 @@ const createItem = (req, res) => {
 
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
+  const { _id } = req.user;
 
-  ClothingItem.findByIdAndDelete(itemId)
+  ClothingItem.findById(itemId)
     .orFail()
-    .then((item) => res.send({ data: item }))
+    .then((item) => {
+      if (_id === item.owner) {
+        ClothingItem.findByIdAndDelete(itemId).then((item) =>
+          res.send({ data: item, owner: _id })
+        );
+      } else {
+        return res
+          .status(FORBIDDEN_STATUS_CODE)
+          .send({ message: "Access Denied" });
+      }
+    })
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {

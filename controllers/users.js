@@ -24,7 +24,7 @@ const createUser = (req, res) => {
   const { name, avatar, email } = req.body;
   bcrypt.hash(req.body.password, 10).then((hash) =>
     User.create({ name, avatar, email, password: hash })
-      .then((user) => res.status(201).send(user))
+      .then(({ name, avatar, email }) => res.status(201).send({ name, avatar, email }))
       .catch((err) => {
         console.error(err);
         if (err.name === "ValidationError") {
@@ -44,9 +44,9 @@ const createUser = (req, res) => {
   );
 };
 
-const getUser = (req, res) => {
-  const { userId } = req.params;
-  User.findById(userId)
+const getCurrentUser = (req, res) => {
+  const { _id } = req.user;
+  User.findById(_id)
     .orFail()
     .then((user) => res.send(user))
     .catch((err) => {
@@ -65,6 +65,28 @@ const getUser = (req, res) => {
     });
 };
 
+const updateCurrentUser = (req, res) => {
+  const { _id } = req.user;
+  const { name, avatar, email } = req.body;
+  User.findByIdAndUpdate(_id, { name, avatar, email }, { new: true })
+    .orFail()
+    .then((user) => res.send(user))
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(NOT_FOUND_STATUS_CODE).send({ message: err.message });
+      }
+      if (err.name === "CastError") {
+        return res
+          .status(BAD_REQUEST_STATUS_CODE)
+          .send({ message: "Invalid data" });
+      }
+      return res
+        .status(SERVER_ERROR_STATUS_CODE)
+        .send({ message: "An error has occurred on the server" });
+    });
+}
+
 const loginUser = (req, res) => {
   const { email, password } = req.body;
   User.findUserByCredentials(email, password)
@@ -81,4 +103,4 @@ const loginUser = (req, res) => {
     });
 };
 
-module.exports = { getUsers, createUser, getUser, loginUser };
+module.exports = { getUsers, createUser, getCurrentUser, updateCurrentUser, loginUser };

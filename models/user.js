@@ -35,6 +35,7 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: [true, "The password field is required."],
+    select: false,
     validate: {
       validator(value) {
         return validator.isStrongPassword(value);

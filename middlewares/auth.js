@@ -1,20 +1,24 @@
 const jwt = require("jsonwebtoken");
-const NOT_AUTHORIZED_STATUS_CODE = require("../utils/errors");
+const { NOT_AUTHORIZED_STATUS_CODE } = require("../utils/errors");
 const { JWT_SECRET } = process.env;
 
 const verifyToken = function (req, res, next) {
   if (req.headers.authorization) {
-    req.headers.authorization.replace("Bearer ", "");
-    const payload = jwt.verify(token, JWT_SECRET);
-    req.user = payload;
-    next();
-  } else {
-    req.headers.authorization.catch((err) => {
-      console.error(err);
+    const token = req.headers.authorization.replace("Bearer ", "");
+    try {
+      const payload = jwt.verify(token, JWT_SECRET);
+      req.user = payload;
+    } catch {
       return res
         .status(NOT_AUTHORIZED_STATUS_CODE)
-        .send({ message: err.message });
-    });
+        .send({ message: "Not Authorized" });
+    }
+    next();
+  } else {
+    return res
+      .status(NOT_AUTHORIZED_STATUS_CODE)
+      .send({ message: "Not Authorized" });
   }
 };
 
+module.exports = { verifyToken };

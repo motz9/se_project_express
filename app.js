@@ -15,13 +15,6 @@ mongoose
   .catch(console.error);
 
 app.use(express.json());
-app.use((req, res, next) => {
-  req.user = {
-    _id: "68620e34acb6d41ef2ffc4cc",
-    required: true,
-  };
-  next();
-});
 
 app.post("/signin", loginUser);
 app.post("/signup", createUser);
