@@ -65,9 +65,8 @@ userSchema.statics.findUserByCredentials = function findUserByCredentials(
   });
 };
 
-userSchema.methods.createJWT = function createJWT()
-{
-  return jwt.sign({ _id: this._id }, JWT_SECRET, { expiresIn: "7d", });
-}
+userSchema.methods.createJWT = function createJWT() {
+  return jwt.sign({ _id: this._id }, JWT_SECRET, { expiresIn: "7d" });
+};
 
 module.exports = mongoose.model("user", userSchema);

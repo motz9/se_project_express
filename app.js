@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const mainRouter = require("./routes/index");
 const { NOT_FOUND_STATUS_CODE } = require("./utils/errors");
 const { loginUser, createUser } = require("./controllers/users");
+const cors = require("cors");
 
 const app = express();
 const { PORT = 3001 } = process.env;
@@ -15,6 +16,7 @@ mongoose
   .catch(console.error);
 
 app.use(express.json());
+app.use(cors());
 
 app.post("/signin", loginUser);
 app.post("/signup", createUser);

@@ -10,7 +10,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const getUsers = (req, res) => {
-  User.find({})
+  User.findOne({ email }).select('+password')
     .then((users) => res.send(users))
     .catch((err) => {
       console.error(err);
@@ -33,7 +33,7 @@ const createUser = (req, res) => {
             .send({ message: "Invalid data" });
         }
         if (err.code === 11000) {
-          return res
+          res
             .status(CONFLICT_ERROR_STATUS_CODE)
             .send({ message: "There was a conflict on the server" });
         }
@@ -67,8 +67,8 @@ const getCurrentUser = (req, res) => {
 
 const updateCurrentUser = (req, res) => {
   const { _id } = req.user;
-  const { name, avatar, email } = req.body;
-  User.findByIdAndUpdate(_id, { name, avatar, email }, { new: true })
+  const { name, avatar } = req.body;
+  User.findByIdAndUpdate(_id, { name, avatar }, { new: true, runValidators: true })
     .orFail()
     .then((user) => res.send(user))
     .catch((err) => {
@@ -85,7 +85,7 @@ const updateCurrentUser = (req, res) => {
         .status(SERVER_ERROR_STATUS_CODE)
         .send({ message: "An error has occurred on the server" });
     });
-}
+};
 
 const loginUser = (req, res) => {
   const { email, password } = req.body;
