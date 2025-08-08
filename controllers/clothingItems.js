@@ -8,7 +8,7 @@ const {
 
 const getItems = (req, res) => {
   ClothingItem.find({})
-    .then((items) => res.send(items))
+    .then((items) => res.status(200).send(items))
     .catch((err) => {
       console.error(err);
       return res
@@ -43,11 +43,12 @@ const deleteItem = (req, res) => {
   ClothingItem.findById(itemId)
     .orFail()
     .then((item) => {
-      if (_id === item.owner) {
-        ClothingItem.deleteOne(item).then((item) =>
-          res.send({ data: item, owner: _id })
-        );
-      } else {
+      if (_id.toString() === item.owner) {
+        return ClothingItem.deleteOne({ _id: itemId }).then(() => {
+          return res.status(200).send({ message: "OK" });
+        });
+      }
+      if (_id.toString() !== item.owner) {
         return res
           .status(FORBIDDEN_STATUS_CODE)
           .send({ message: "Access Denied" });
@@ -76,7 +77,7 @@ const likeItem = (req, res) =>
     { new: true }
   )
     .orFail()
-    .then((item) => res.send({ data: item }))
+    .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
@@ -99,7 +100,7 @@ const dislikeItem = (req, res) =>
     { new: true }
   )
     .orFail()
-    .then((item) => res.send({ data: item }))
+    .then((item) => res.statu(200).send({ data: item }))
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {

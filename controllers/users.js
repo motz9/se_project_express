@@ -1,3 +1,5 @@
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const {
   BAD_REQUEST_STATUS_CODE,
@@ -6,12 +8,10 @@ const {
   CONFLICT_ERROR_STATUS_CODE,
   NOT_AUTHORIZED_STATUS_CODE,
 } = require("../utils/errors");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 
 const getUsers = (req, res) => {
-  User.findOne({ email }).select('+password')
-    .then((users) => res.send(users))
+  User.find({})
+    .then((users) => res.status(200).send(users))
     .catch((err) => {
       console.error(err);
       return res
@@ -24,7 +24,14 @@ const createUser = (req, res) => {
   const { name, avatar, email } = req.body;
   bcrypt.hash(req.body.password, 10).then((hash) =>
     User.create({ name, avatar, email, password: hash })
-      .then(({ name, avatar, email }) => res.status(201).send({ name, avatar, email }))
+      .then((createdUser) => {
+        const safeUserData = {
+          name: createdUser.name,
+          avatar: createdUser.avatar,
+          email: createdUser.email,
+        };
+        res.status(201).send(safeUserData);
+      })
       .catch((err) => {
         console.error(err);
         if (err.name === "ValidationError") {
@@ -48,7 +55,7 @@ const getCurrentUser = (req, res) => {
   const { _id } = req.user;
   User.findById(_id)
     .orFail()
-    .then((user) => res.send(user))
+    .then((user) => res.status(200).send(user))
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
@@ -68,9 +75,13 @@ const getCurrentUser = (req, res) => {
 const updateCurrentUser = (req, res) => {
   const { _id } = req.user;
   const { name, avatar } = req.body;
-  User.findByIdAndUpdate(_id, { name, avatar }, { new: true, runValidators: true })
+  User.findByIdAndUpdate(
+    _id,
+    { name, avatar },
+    { new: true, runValidators: true }
+  )
     .orFail()
-    .then((user) => res.send(user))
+    .then((user) => res.status(200).send(user))
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
@@ -92,7 +103,7 @@ const loginUser = (req, res) => {
   User.findUserByCredentials(email, password)
     .then((user) => {
       return user.createJWT().then((token) => {
-        res.send(token);
+        res.status(201).send(token);
       });
     })
     .catch((err) => {
@@ -103,4 +114,10 @@ const loginUser = (req, res) => {
     });
 };
 
-module.exports = { getUsers, createUser, getCurrentUser, updateCurrentUser, loginUser };
+module.exports = {
+  getUsers,
+  createUser,
+  getCurrentUser,
+  updateCurrentUser,
+  loginUser,
+};

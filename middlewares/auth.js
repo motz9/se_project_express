@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { NOT_AUTHORIZED_STATUS_CODE } = require("../utils/errors");
+
 const { JWT_SECRET } = process.env;
 
 const verifyToken = function (req, res, next) {
@@ -13,8 +14,9 @@ const verifyToken = function (req, res, next) {
         .status(NOT_AUTHORIZED_STATUS_CODE)
         .send({ message: "Not Authorized" });
     }
-    next();
-  } else {
+     return next();
+  };
+  if (!req.headers.authorization) {
     return res
       .status(NOT_AUTHORIZED_STATUS_CODE)
       .send({ message: "Not Authorized" });
