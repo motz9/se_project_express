@@ -45,8 +45,9 @@ const deleteItem = (req, res) => {
     .then((item) => {
       if (_id.toString() === item.owner.toString()) {
         return ClothingItem.deleteOne({ _id: itemId });
+      } else {
+        throw new Error("Forbidden");
       }
-      throw new Error("Forbidden");
     })
     .then(() => {
       res.status(200).send({ message: "Ok" });
