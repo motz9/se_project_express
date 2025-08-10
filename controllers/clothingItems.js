@@ -3,6 +3,7 @@ const {
   BAD_REQUEST_STATUS_CODE,
   NOT_FOUND_STATUS_CODE,
   SERVER_ERROR_STATUS_CODE,
+  FORBIDDEN_STATUS_CODE,
 } = require("../utils/errors");
 
 const getItems = (req, res) => {
@@ -43,18 +44,18 @@ const deleteItem = (req, res) => {
     .orFail()
     .then((item) => {
       if (_id.toString() === item.owner.toString()) {
-        return ClothingItem.deleteOne({ _id: itemId }).then(() => {
-          return res.status(204).send({ message: "No Content" });
-        });
+        return ClothingItem.deleteOne({ _id: itemId });
       }
-      if (_id.toString() !== item.owner.toString()) {
-        return res
-          .status(NOT_FOUND_STATUS_CODE)
-          .send({ message: "Resource Not Found" });
-      }
+      throw new Error("Forbidden");
+    })
+    .then(() => {
+      res.status(200).send({ message: "Ok" });
     })
     .catch((err) => {
       console.error(err);
+      if (err.message === "Forbidden") {
+        return res.status(FORBIDDEN_STATUS_CODE).send({ message: "Forbidden" });
+      }
       if (err.name === "DocumentNotFoundError") {
         return res.status(NOT_FOUND_STATUS_CODE).send({ message: err.message });
       }
