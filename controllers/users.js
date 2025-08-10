@@ -9,9 +9,19 @@ const {
   NOT_AUTHORIZED_STATUS_CODE,
 } = require("../utils/errors");
 
+function createSafeUserData(user) {
+  return {
+    name: user.name,
+    avatar: user.avatar,
+    email: user.email,
+  };
+}
+
 const getUsers = (req, res) => {
   User.find({})
-    .then((users) => res.status(200).send(users))
+    .then((users) =>
+      res.status(200).send(users.map((user) => createSafeUserData(user)))
+    )
     .catch((err) => {
       console.error(err);
       return res
@@ -25,12 +35,7 @@ const createUser = (req, res) => {
   bcrypt.hash(req.body.password, 10).then((hash) =>
     User.create({ name, avatar, email, password: hash })
       .then((createdUser) => {
-        const safeUserData = {
-          name: createdUser.name,
-          avatar: createdUser.avatar,
-          email: createdUser.email,
-        };
-        res.status(201).send(safeUserData);
+        res.status(201).send(createSafeUserData(createdUser));
       })
       .catch((err) => {
         console.error(err);
@@ -40,7 +45,7 @@ const createUser = (req, res) => {
             .send({ message: "Invalid data" });
         }
         if (err.code === 11000) {
-          res
+          return res
             .status(CONFLICT_ERROR_STATUS_CODE)
             .send({ message: "There was a conflict on the server" });
         }
@@ -55,7 +60,9 @@ const getCurrentUser = (req, res) => {
   const { _id } = req.user;
   User.findById(_id)
     .orFail()
-    .then((user) => res.status(200).send(user))
+    .then((currentUser) =>
+      res.status(200).send(createSafeUserData(currentUser))
+    )
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
@@ -81,7 +88,9 @@ const updateCurrentUser = (req, res) => {
     { new: true, runValidators: true }
   )
     .orFail()
-    .then((user) => res.status(200).send(user))
+    .then((currentUser) =>
+      res.status(200).send(createSafeUserData(currentUser))
+    )
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
@@ -102,15 +111,14 @@ const loginUser = (req, res) => {
   const { email, password } = req.body;
   User.findUserByCredentials(email, password)
     .then((user) => {
-      return user.createJWT().then((token) => {
-        res.status(201).send(token);
-      });
+      const token = user.createJWT();
+      return res
+        .status(200)
+        .send({ data: createSafeUserData(user), token: token });
     })
     .catch((err) => {
       console.error(err);
-      return res
-        .status(NOT_AUTHORIZED_STATUS_CODE)
-        .send({ message: err.message });
+      return res.status(BAD_REQUEST_STATUS_CODE).send({ message: err.message });
     });
 };
 
