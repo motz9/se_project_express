@@ -45,9 +45,9 @@ const deleteItem = (req, res) => {
     .then((item) => {
       if (_id.toString() === item.owner.toString()) {
         return ClothingItem.deleteOne({ _id: itemId });
-      } else {
+      } 
         throw new Error("Forbidden");
-      }
+
     })
     .then(() => {
       res.status(200).send({ message: "Ok" });
@@ -70,6 +70,7 @@ const deleteItem = (req, res) => {
         .send({ message: "An error has occurred on the server" });
     });
 };
+
 
 const likeItem = (req, res) =>
   ClothingItem.findByIdAndUpdate(
