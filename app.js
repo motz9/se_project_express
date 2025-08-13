@@ -23,7 +23,7 @@ app.post("/signup", createUser);
 
 app.use("/", mainRouter);
 app.use((req, res, next) => {
-  res.status(NOT_FOUND_STATUS_CODE).send({ message: "Requested resource not found" });
+  res.status(NOT_FOUND_STATUS_CODE).send({ message: "Resource not found" });
   next();
 });
 

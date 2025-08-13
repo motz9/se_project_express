@@ -8,7 +8,7 @@ const {
 
 const getItems = (req, res) => {
   ClothingItem.find({})
-    .then((items) => res.status(200).send(items))
+    .then((items) => res.send(items))
     .catch((err) => {
       console.error(err);
       return res
@@ -45,7 +45,7 @@ const deleteItem = (req, res) => {
     .then((item) => {
       if (_id.toString() === item.owner.toString()) {
         return ClothingItem.deleteOne({ _id: itemId });
-      } 
+      }
         throw new Error("Forbidden");
 
     })
@@ -58,7 +58,7 @@ const deleteItem = (req, res) => {
         return res.status(FORBIDDEN_STATUS_CODE).send({ message: "Forbidden" });
       }
       if (err.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND_STATUS_CODE).send({ message: err.message });
+        return res.status(NOT_FOUND_STATUS_CODE).send({ message: "Resource not found" });
       }
       if (err.name === "CastError") {
         return res
@@ -83,7 +83,7 @@ const likeItem = (req, res) =>
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND_STATUS_CODE).send({ message: err.message });
+        return res.status(NOT_FOUND_STATUS_CODE).send({ message: "Resource not found" });
       }
       if (err.name === "CastError") {
         return res
@@ -106,7 +106,7 @@ const dislikeItem = (req, res) =>
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND_STATUS_CODE).send({ message: err.message });
+        return res.status(NOT_FOUND_STATUS_CODE).send({ message: "Resource not found" });
       }
       if (err.name === "CastError") {
         return res

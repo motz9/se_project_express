@@ -5,6 +5,7 @@ const {
   NOT_FOUND_STATUS_CODE,
   SERVER_ERROR_STATUS_CODE,
   CONFLICT_ERROR_STATUS_CODE,
+  NOT_AUTHORIZED_STATUS_CODE,
 } = require("../utils/errors");
 
 function createSafeUserData(user) {
@@ -12,6 +13,7 @@ function createSafeUserData(user) {
     name: user.name,
     avatar: user.avatar,
     email: user.email,
+    _id: user._id,
   };
 }
 
@@ -64,7 +66,9 @@ const getCurrentUser = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND_STATUS_CODE).send({ message: err.message });
+        return res
+          .status(NOT_FOUND_STATUS_CODE)
+          .send({ message: "Resource not found" });
       }
       if (err.name === "CastError") {
         return res
@@ -92,7 +96,9 @@ const updateCurrentUser = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND_STATUS_CODE).send({ message: err.message });
+        return res
+          .status(NOT_FOUND_STATUS_CODE)
+          .send({ message: "Resource not found" });
       }
       if (err.name === "CastError") {
         return res
@@ -107,6 +113,11 @@ const updateCurrentUser = (req, res) => {
 
 const loginUser = (req, res) => {
   const { email, password } = req.body;
+  if (!email || !password) {
+    return res
+      .status(BAD_REQUEST_STATUS_CODE)
+      .send({ message: "Invalid data" });
+  }
   User.findUserByCredentials(email, password)
     .then((user) => {
       const token = user.createJWT();
@@ -114,7 +125,11 @@ const loginUser = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      return res.status(BAD_REQUEST_STATUS_CODE).send({ message: err.message });
+      if (err.message === "Incorrect email or password") {
+        return res
+          .status(NOT_AUTHORIZED_STATUS_CODE)
+          .send({ message: "Not authorized" });
+      }
     });
 };
 

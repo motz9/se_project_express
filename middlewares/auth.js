@@ -14,12 +14,12 @@ const verifyToken = (req, res, next) => {
     } catch {
       res
         .status(NOT_AUTHORIZED_STATUS_CODE)
-        .send({ message: "Not Authorized" });
+        .send({ message: "Not authorized" });
       return;
     }
   }
   if (!req.headers.authorization) {
-    res.status(NOT_AUTHORIZED_STATUS_CODE).send({ message: "Not Authorized" });
+    res.status(NOT_AUTHORIZED_STATUS_CODE).send({ message: "Not authorized" });
   }
 };
 
