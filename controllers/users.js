@@ -19,9 +19,7 @@ function createSafeUserData(user) {
 
 const getUsers = (req, res) => {
   User.find({})
-    .then((users) =>
-      res.send(users.map((user) => createSafeUserData(user)))
-    )
+    .then((users) => res.send(users.map((user) => createSafeUserData(user))))
     .catch((err) => {
       console.error(err);
       return res
@@ -60,9 +58,7 @@ const getCurrentUser = (req, res) => {
   const { _id } = req.user;
   User.findById(_id)
     .orFail()
-    .then((currentUser) =>
-      res.send(createSafeUserData(currentUser))
-    )
+    .then((currentUser) => res.send(createSafeUserData(currentUser)))
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
@@ -90,9 +86,7 @@ const updateCurrentUser = (req, res) => {
     { new: true, runValidators: true }
   )
     .orFail()
-    .then((currentUser) =>
-      res.send(createSafeUserData(currentUser))
-    )
+    .then((currentUser) => res.send(createSafeUserData(currentUser)))
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
@@ -118,7 +112,7 @@ const loginUser = (req, res) => {
       .status(BAD_REQUEST_STATUS_CODE)
       .send({ message: "Invalid data" });
   }
-  User.findUserByCredentials(email, password)
+  return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = user.createJWT();
       return res.send({ data: createSafeUserData(user), token });
